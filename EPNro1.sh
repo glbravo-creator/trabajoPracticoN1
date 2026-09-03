@@ -24,7 +24,7 @@ else
 			mkdir -p $HOME/EPNro1/entrada
 			mkdir -p $HOME/EPNro1/salida
 			mkdir -p $HOME/EPNro1/procesado
-			cp $HOME/consolidar.sh $HOME/EPNro1/
+			cp ~/Desktop/trabajoPracticoN1/consolidar.sh $HOME/
 			chmod +x $HOME/EPNro1/consolidar.sh
 			echo -e "Entorno creado!\n"
 			;;
