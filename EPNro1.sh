@@ -1,9 +1,18 @@
 #!/bin/bash
+
+# Defino las variables locales
+EPDIR="$HOME/EPNro1"
+ENTRADA="$EPDIR/entrada"
+SALIDA="$EPDIR/salida"
+PROCESADO="$EPDIR/procesado"
+LOG="$EPDIR/procesado.log"
+CONSOLIDAR="$EPDIR/consolidar.sh"
+
 # Eliminar entorno con -d
 if [[ $1 == "-d" ]]; then
 	echo "Eliminando estructura y apagando procesos...."
 	pkill -f consolidar.sh
-	rm -rf $HOME/EPNro1
+	rm -rf $EPDIR
 else
 	opcion=""
 	while [[ $opcion != "7" ]]; do
@@ -21,10 +30,10 @@ else
 		# Procesamiento de opciones con case
 		case $opcion in
 		1)
-			mkdir -p $HOME/EPNro1/entrada
-			mkdir -p $HOME/EPNro1/salida
-			mkdir -p $HOME/EPNro1/procesado
-			cp ~/Desktop/trabajoPracticoN1/consolidar.sh $HOME/
+			mkdir -p "$ENTRADA"
+			mkdir -p "$SALIDA"
+			mkdir -p "$PROCESADO"
+			cp consolidar.sh $EPDIR
 			chmod +x $HOME/EPNro1/consolidar.sh
 			echo -e "Entorno creado!\n"
 			;;
@@ -32,29 +41,29 @@ else
 			if pgrep -f "consolidar.sh" >/dev/null; then # Verifica si corre el proceso y silencia la salida (/dev/null)
 				echo -e "El proceso consolidar.sh ya está ejecutado en background.\n"
 			else
-				$HOME/EPNro1/consolidar.sh &
+				nohup "$CONSOLIDAR" >> "$EPDIR/consolidar.out" 2>&1 &
 				echo -e "Proceso consolidar.sh iniciado en background.\n"
 			fi
 			;;
 		3)
-			if [[ -f "$HOME/EPNro1/salida/$FILENAME.txt" ]]; then
-				sort -n "$HOME/EPNro1/salida/$FILENAME.txt"
+			if [[ -f "$SALIDA/$FILENAME.txt" ]]; then
+				sort -n "$SALIDA/$FILENAME.txt"
 			else
 				echo -e "No existe $FILENAME.txt o no se creo aún.\n"
 			fi
 			;;
 		4) # Formato esperado: campos separados por espacios/tabs (la nota debe ser la columna 5).
-			if [[ -f "$HOME/EPNro1/salida/$FILENAME.txt" ]]; then
-				sort -rn -k5 "$HOME/EPNro1/salida/$FILENAME.txt" | head -10
+			if [[ -f "$SALIDA/$FILENAME.txt" ]]; then
+				sort -rn -k5 "$SALIDA/$FILENAME.txt" | head -10
 			else
 				echo -e "No existe $FILENAME.txt en la carpeta salida.\n"
 			fi
 			;;
 		5)
-			if [[ -f "$HOME/EPNro1/salida/$FILENAME.txt" ]]; then
+			if [[ -f "$SALIDA/$FILENAME.txt" ]]; then
 				echo -n "Ingrese el número de padrón a buscar: "
 				read padron
-				resultado=$(grep -w "^$padron" "$HOME/EPNro1/salida/$FILENAME.txt") # ^ busca al inicio del renglón y -w el padrón exacto.
+				resultado=$(grep -w "^$padron" "$SALIDA/$FILENAME.txt") # ^ busca al inicio del renglón y -w el padrón exacto.
 				if [[ -n "$resultado" ]]; then
 					echo "$resultado"
 				else
@@ -65,8 +74,8 @@ else
 			fi
 			;;
 		6)
-			if [[ -f "$HOME/EPNro1/procesado.log" ]]; then
-				cat "$HOME/EPNro1/procesado.log"
+			if [[ -f "$LOG" ]]; then
+				cat "$LOG"
 			else
 				echo -e "Aun no existe el archivo de log.\n"
 			fi
